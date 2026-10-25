@@ -7,6 +7,7 @@ await fs.mkdir(site,{recursive:true});
 await fs.cp('dist/outlook-addin',site,{recursive:true});
 for(const file of ['index.html','site.css','site.js'])await fs.copyFile('web/landing/'+file,site+'/'+file);
 await fs.copyFile('web/hub/outlook.svg',site+'/outlook.svg');
+await fs.cp('web/landing/samples',site+'/samples',{recursive:true});
 // A single user-facing guide; taskpane privacy links return to the same page.
 await fs.writeFile(site+'/privacy.html','<!doctype html><html lang="ja"><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=./#privacy"><title>Monja Privacy</title><a href="./#privacy">Privacy / プライバシー / 隐私</a></html>');
 if(!process.argv.includes('--signature-only'))for(const file of ['index.html','hub.css','hub.js','outlook.svg'])await fs.copyFile('web/hub/'+file,root+'/dist/'+file);
