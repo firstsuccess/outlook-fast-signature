@@ -1,0 +1,19 @@
+export function manifest(base,support){const xml=`<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xsi:type="MailApp">
+<Id>4a83abe6-24d0-4fd8-9559-743fc9c551b9</Id><Version>1.0.10.0</Version><ProviderName>First Success G.K.</ProviderName><DefaultLocale>ja-JP</DefaultLocale>
+<DisplayName DefaultValue="もんじゃ高速署名"><Override Locale="en-US" Value="Monja Fast Signature"/><Override Locale="zh-CN" Value="Monja 快速签名"/></DisplayName>
+<Description DefaultValue="端末内で署名を管理し、メール作成画面から切り替えます。"><Override Locale="en-US" Value="Manage signatures locally and switch them while composing mail."/></Description>
+<IconUrl DefaultValue="${base}/assets/icon-64.png"/><HighResolutionIconUrl DefaultValue="${base}/assets/icon-128.png"/><SupportUrl DefaultValue="${support}"/>
+<AppDomains><AppDomain>${new URL(base).origin}</AppDomain></AppDomains><Hosts><Host Name="Mailbox"/></Hosts><Requirements><Sets><Set Name="Mailbox" MinVersion="1.3"/></Sets></Requirements>
+<FormSettings><Form xsi:type="ItemEdit"><DesktopSettings><SourceLocation DefaultValue="${base}/taskpane.html"/></DesktopSettings></Form></FormSettings>
+<Permissions>ReadWriteItem</Permissions><Rule xsi:type="ItemIs" ItemType="Message" FormType="Edit"/><DisableEntityHighlighting>false</DisableEntityHighlighting>
+<VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
+<Requirements><bt:Sets DefaultMinVersion="1.3"><bt:Set Name="Mailbox"/></bt:Sets></Requirements>
+<Hosts><Host xsi:type="MailHost"><DesktopFormFactor><FunctionFile resid="Taskpane.Url"/><ExtensionPoint xsi:type="MessageComposeCommandSurface"><OfficeTab id="TabDefault"><Group id="Monja.Group"><Label resid="Monja.Label"/><Control xsi:type="Button" id="Monja.Open"><Label resid="Monja.Label"/><Supertip><Title resid="Monja.Label"/><Description resid="Monja.Description"/></Supertip><Icon><bt:Image size="16" resid="Icon.16"/><bt:Image size="32" resid="Icon.32"/><bt:Image size="80" resid="Icon.80"/></Icon><Action xsi:type="ShowTaskpane"><SourceLocation resid="Taskpane.Url"/></Action></Control></Group></OfficeTab></ExtensionPoint></DesktopFormFactor></Host></Hosts>
+<Resources><bt:Images><bt:Image id="Icon.16" DefaultValue="${base}/assets/icon-16.png"/><bt:Image id="Icon.32" DefaultValue="${base}/assets/icon-32.png"/><bt:Image id="Icon.80" DefaultValue="${base}/assets/icon-80.png"/></bt:Images><bt:Urls><bt:Url id="Taskpane.Url" DefaultValue="${base}/taskpane.html"/></bt:Urls><bt:ShortStrings><bt:String id="Monja.Label" DefaultValue="もんじゃ高速署名"><bt:Override Locale="en-US" Value="Monja Fast Signature"/></bt:String></bt:ShortStrings><bt:LongStrings><bt:String id="Monja.Description" DefaultValue="署名を選択・管理"><bt:Override Locale="en-US" Value="Select and manage signatures"/></bt:String></bt:LongStrings></Resources>
+</VersionOverrides></OfficeApp>`;
+ const start=xml.indexOf('<Requirements><bt:Sets');const end=xml.indexOf('</Resources>',start)+'</Resources>'.length;
+ const nested=xml.slice(start,end).replace('DefaultMinVersion="1.3"','DefaultMinVersion="1.5"').replace('<SourceLocation resid="Taskpane.Url"/></Action>','<SourceLocation resid="Taskpane.Url"/><SupportsPinning>true</SupportsPinning></Action>');
+ return xml.replace('</VersionOverrides></OfficeApp>',`<VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">${nested}</VersionOverrides></VersionOverrides></OfficeApp>`);
+}
+

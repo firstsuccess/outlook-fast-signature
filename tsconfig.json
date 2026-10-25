@@ -1,0 +1,1 @@
+{"compilerOptions":{"target":"ES2022","module":"ESNext","moduleResolution":"Bundler","resolveJsonModule":true,"lib":["ES2022","DOM","DOM.Iterable"],"strict":true,"skipLibCheck":true,"noEmit":true,"types":["chrome","office-js","node"]},"include":["shared/**/*.ts","web/**/*.ts","browser-extension/src/**/*.ts","outlook-addin/src/**/*.ts","tests/**/*.ts"]}

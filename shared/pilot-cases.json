@@ -1,0 +1,15 @@
+{
+  "clients": ["web-extension", "office-web", "outlook-new", "outlook-classic"],
+  "cases": [
+    {"id":"install","label":"導入・管理画面の起動"},
+    {"id":"switch","label":"新規メールでA→B→署名なし→A"},
+    {"id":"reply-forward","label":"返信・全員返信・転送と引用履歴の保全"},
+    {"id":"multiple-windows","label":"複数作成画面・別窓の分離"},
+    {"id":"sender","label":"送信アカウント変更と署名選択"},
+    {"id":"draft","label":"下書き保存完了→閉じる→再表示"},
+    {"id":"send","label":"送信・受信HTML（操作UI混入なし）"},
+    {"id":"images","label":"画像の送受信（WebはHTTPS、OfficeはCIDも確認）"},
+    {"id":"undo","label":"本文追記・署名手編集・取り消しと安全停止"},
+    {"id":"backup","label":"JSON移行・再起動・署名復元"}
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "もんじゃ高速署名 / Monja Fast Signature",
+  "version": "0.2.9",
+  "description": "Local signature library and safe signature switching for Outlook Web. 日本語 / English / 中文",
+  "permissions": [
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "assets/icon-16.png",
+    "32": "assets/icon-32.png",
+    "64": "assets/icon-64.png",
+    "128": "assets/icon-128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Monja Fast Signature"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://outlook.office.com/*",
+        "https://outlook.office365.com/*",
+        "https://outlook.live.com/*",
+        "https://outlook.cloud.microsoft/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'none'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoz+GqsNTWgOuiEr/uZkK7kBshY87WU9/ZXxYh16TZ6vXCy9OenVYcwTlcZVj3hLLtZnRS6RjqHhOSdAZOgJgOEqmG4H+XfXL0Dvch46dHwe11ZQkcaPV+3ke5arVrqNkAAp9/6RjJrH514x7YaT5fGiWA0AJn84eHrXUEcX0uLhApN2g6sGcAiqwoueIhygTfUTzfpzPcoG0MQFEVTdeuQcp/p3f5Eqb0brG8Lhm4nGqC3Yz8CkT5ZC6MGHq+7djA9O6wjTxtDpYqqCquItSk1Gi1wEL4AwhR4cHy1clPkVLGgTBtNguk05cowPmNlVrv/a18ql3ys9PQ6+LODLrzwIDAQAB"
+}
+

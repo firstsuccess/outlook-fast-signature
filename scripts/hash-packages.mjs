@@ -1,0 +1,2 @@
+import fs from 'node:fs/promises';import {createHash} from 'node:crypto';
+const dir='dist/packages';const rows=[];for(const file of (await fs.readdir(dir)).filter(f=>f.endsWith('.zip')).sort()){const data=await fs.readFile(dir+'/'+file);rows.push(createHash('sha256').update(data).digest('hex')+'  '+file);}await fs.writeFile(dir+'/SHA256SUMS.txt',rows.join('\n')+'\n');console.log(`Created ${rows.length} distribution archives with SHA-256 hashes.`);

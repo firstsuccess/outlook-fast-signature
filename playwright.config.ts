@@ -1,0 +1,2 @@
+import {defineConfig} from '@playwright/test';
+export default defineConfig({testDir:'tests/e2e',fullyParallel:false,workers:1,use:{baseURL:'http://127.0.0.1:4173',headless:true,launchOptions:{executablePath:process.env.MONJA_BROWSER_EXE||'C:/Program Files/Google/Chrome/Application/chrome.exe'}},webServer:{command:'node scripts/serve.mjs',url:'http://127.0.0.1:4173/options.html',reuseExistingServer:false}});

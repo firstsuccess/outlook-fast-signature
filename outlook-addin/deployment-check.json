@@ -1,0 +1,52 @@
+﻿[
+    {
+        "url":  "https://outlook-add-in.mnoda1979.chatgpt.site/fast-signature/#support",
+        "passed":  true,
+        "detail":  "text/html"
+    },
+    {
+        "url":  "https://outlook-add-in.mnoda1979.chatgpt.site/fast-signature/app.js",
+        "passed":  true,
+        "detail":  "text/javascript"
+    },
+    {
+        "url":  "https://outlook-add-in.mnoda1979.chatgpt.site/fast-signature/assets/icon-128.png",
+        "passed":  true,
+        "detail":  "image/png"
+    },
+    {
+        "url":  "https://outlook-add-in.mnoda1979.chatgpt.site/fast-signature/assets/icon-16.png",
+        "passed":  true,
+        "detail":  "image/png"
+    },
+    {
+        "url":  "https://outlook-add-in.mnoda1979.chatgpt.site/fast-signature/assets/icon-32.png",
+        "passed":  true,
+        "detail":  "image/png"
+    },
+    {
+        "url":  "https://outlook-add-in.mnoda1979.chatgpt.site/fast-signature/assets/icon-64.png",
+        "passed":  true,
+        "detail":  "image/png"
+    },
+    {
+        "url":  "https://outlook-add-in.mnoda1979.chatgpt.site/fast-signature/assets/icon-80.png",
+        "passed":  true,
+        "detail":  "image/png"
+    },
+    {
+        "url":  "https://outlook-add-in.mnoda1979.chatgpt.site/fast-signature/health.html",
+        "passed":  true,
+        "detail":  "text/html"
+    },
+    {
+        "url":  "https://outlook-add-in.mnoda1979.chatgpt.site/fast-signature/style.css",
+        "passed":  true,
+        "detail":  "text/css"
+    },
+    {
+        "url":  "https://outlook-add-in.mnoda1979.chatgpt.site/fast-signature/taskpane.html",
+        "passed":  true,
+        "detail":  "text/html"
+    }
+]

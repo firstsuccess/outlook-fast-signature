@@ -1,0 +1,34 @@
+import {test,expect,chromium} from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
+test('real unpacked MV3 extension: options storage, content injection and background routing (fixture Outlook page)',async({},info)=>{
+ const executable=process.env.MONJA_EXTENSION_BROWSER_EXE||path.resolve('.cache/browsers/chromium-1248/chrome-win64/chrome.exe');
+ test.skip(!fs.existsSync(executable),'Install test Chromium: PLAYWRIGHT_BROWSERS_PATH=.cache/browsers npx playwright install chromium');
+ const extension=path.resolve('dist/browser-extension');const context=await chromium.launchPersistentContext(info.outputPath('profile'),{executablePath:executable,headless:true,args:[`--disable-extensions-except=${extension}`,`--load-extension=${extension}`]});
+ try{
+ const worker=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker');const id=worker.url().split('/')[2];
+ const popup=await context.newPage();await popup.goto('chrome-extension://'+id+'/popup.html');await expect(popup.locator('select')).toHaveCount(0);await expect(popup.getByRole('button')).toHaveCount(1);await expect(popup.getByRole('button')).toHaveText('設定');const opened=context.waitForEvent('page');await popup.getByRole('button',{name:'設定',exact:true}).click();const options=await opened;await options.waitForLoadState();await expect(options.locator('h2').first()).toHaveText('署名一覧');await popup.close();await options.getByLabel('署名名',{exact:true}).fill('代表者署名');await options.locator('#editor').fill('ファーストサクセス合同会社');await options.getByRole('button',{name:'保存',exact:true}).click();await expect(options.locator('#list button')).toHaveCount(1);
+ await expect(options.frameLocator('#preview').locator('body')).toHaveText('ファーストサクセス合同会社');await options.screenshot({path:path.resolve('dist/management-preview.png'),fullPage:true});
+ await options.locator('#signatureSelect').selectOption('__choose');await options.locator('#signatureSelect').selectOption({label:'代表者署名'});await expect(options.locator('#status')).toContainText('署名の選択とプレビューは保存しました');const savedId=await options.locator('#signatureSelect').inputValue();await options.reload();await expect(options.locator('#signatureSelect')).toHaveValue(savedId);await expect(options.locator('#editor')).toHaveText('ファーストサクセス合同会社');
+ const mail=await context.newPage();const errors:string[]=[];mail.on('pageerror',e=>errors.push(e.message));await mail.route('https://outlook.office.com/**',route=>route.fulfill({contentType:'text/html; charset=utf-8',body:'<!doctype html><html><body><h1>Outlook fixture — NOT real Outlook</h1><div id="body" contenteditable="true" role="textbox" aria-label="本文" style="width:600px;height:200px;border:1px solid"></div></body></html>'}));await mail.goto('https://outlook.office.com/mail/');await expect(mail.locator('[data-monja-ui]')).toHaveCount(1);await mail.locator('#body').click();
+ await expect.poll(()=>worker.evaluate(async()=>!!(await chrome.storage.session.get('composeTab')).composeTab)).toBe(true);
+ await options.bringToFront();await options.locator('#signatureSelect').selectOption({label:'代表者署名'});await expect(mail.locator('#body')).toHaveText('ファーストサクセス合同会社');await expect(mail.locator('#body [data-monja-signature]')).toHaveCount(1);await expect(mail.locator('#body select,#body button')).toHaveCount(0);
+ await options.locator('#signatureSelect').selectOption('');await expect(mail.locator('#body')).toHaveText('');await options.locator('#signatureSelect').selectOption({label:'代表者署名'});await expect(mail.locator('#body [data-monja-signature]')).toHaveCount(1);
+ // The closed Shadow DOM picker is reached through the same keyboard path as users.
+ await mail.bringToFront();await mail.locator('#body').focus();for(let i=0;i<1;i++)await mail.keyboard.press('Tab');await mail.keyboard.press('End');await expect(mail.locator('#body')).toHaveText('ファーストサクセス合同会社');
+ await worker.evaluate(async()=>{await chrome.storage.session.set({testSelectionRefresh:1});});await mail.keyboard.press('Home');await mail.keyboard.press('ArrowDown');await expect(mail.locator('#body')).toHaveText('');await mail.keyboard.press('End');await expect(mail.locator('#body')).toHaveText('ファーストサクセス合同会社');
+ await worker.evaluate(async()=>{const key='monja-fast-signature-v1';const stored=await chrome.storage.local.get(key);const lib=JSON.parse(stored[key] as string);lib.defaults['']={new:lib.signatures[0].id,reply:'',forward:lib.signatures[0].id};await chrome.storage.local.set({[key]:JSON.stringify(lib)});});await mail.keyboard.press('Home');await mail.keyboard.press('ArrowDown');await expect(mail.locator('#body')).toHaveText('');await mail.keyboard.press('End');await expect(mail.locator('#body')).toHaveText('ファーストサクセス合同会社');
+ // Default aliases resolve dynamically and apply immediately, with no second button.
+ await mail.keyboard.press('Home');await mail.keyboard.press('ArrowDown');await mail.keyboard.press('ArrowDown');await expect(mail.locator('#body')).toHaveText('ファーストサクセス合同会社');await mail.keyboard.press('ArrowDown');await expect(mail.locator('#body')).toHaveText('');await mail.keyboard.press('ArrowDown');await expect(mail.locator('#body')).toHaveText('ファーストサクセス合同会社');
+ await mail.bringToFront();await mail.locator('#body').focus();await mail.keyboard.press('Control+z');await expect(mail.locator('#body')).toHaveText('');await options.bringToFront();await options.locator('#signatureSelect').selectOption('');await expect(options.locator('#status')).toContainText('署名部分を特定できません');await expect(mail.locator('#body')).toHaveText('');
+ // A stale target from a closed draft must not route into its replacement.
+ await mail.evaluate(()=>{const old=document.querySelector('#body')!;old.outerHTML='<div id="body" contenteditable="true" role="textbox" aria-label="本文" style="width:600px;height:200px">Replacement draft</div>';});await expect(mail.locator('[data-monja-ui]')).toHaveCount(1);await options.locator('#signatureSelect').selectOption({label:'代表者署名'});await expect(options.locator('#status')).toContainText('対象のメールが変わりました');await expect(mail.locator('#body')).toHaveText('Replacement draft');
+ // Reach Settings in the closed Shadow DOM and verify real openOptionsPage routing.
+ await mail.bringToFront();await mail.locator('#body').focus();await mail.keyboard.press('Tab');await mail.keyboard.press('Tab');await mail.keyboard.press('Enter');await expect.poll(()=>options.evaluate(()=>document.visibilityState)).toBe('visible');await expect(options.locator('h2').first()).toHaveText('署名一覧');
+ // Reloading the actual unpacked extension invalidates its old content-script context.
+ await worker.evaluate(()=>chrome.runtime.reload()).catch(()=>{});await mail.locator('#body').click();await expect(mail.locator('[data-monja-ui]')).toHaveCount(0);await expect(mail.locator('#body')).toHaveText('Replacement draft');expect(errors).toEqual([]);
+ }finally{await context.close();}
+});
+
+
+
